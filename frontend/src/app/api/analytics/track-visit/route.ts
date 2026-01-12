@@ -32,9 +32,7 @@ export async function POST(request: NextRequest) {
               timeSpent: 0, // Will be updated when they leave the page
             }
           ],
-          'visitedPages': [
-            ...new Set([...(existingVisitor.visitedPages || []), pageUrl])
-          ],
+          'visitedPages': Array.from(new Set([...(existingVisitor.visitedPages || []), pageUrl])),
         })
         .commit();
     } else {
