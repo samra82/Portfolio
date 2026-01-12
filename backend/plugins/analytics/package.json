@@ -1,0 +1,17 @@
+{
+  "name": "@sanity/google-analytics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Google Analytics plugin for Sanity Studio",
+  "keywords": [
+    "sanity",
+    "cms",
+    "analytics",
+    "google-analytics"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "sanity": "^4.0.0"
+  }
+}
