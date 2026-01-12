@@ -10,12 +10,30 @@ import ProjectPieChart from '@/components/charts/ProjectPieChart';
 import TimeSpentChart from '@/components/charts/TimeSpentChart';
 import { getVisitorsOverTime, getProjectClicksData, getTimeSpentData } from '@/lib/analytics';
 
+interface VisitorStats {
+  totalVisitors: number;
+  totalPageViews: number;
+  totalProjectClicks: number;
+  avgTimeSpent: number;
+}
+
+interface ProjectAnalytics {
+  _id: string;
+  title: string;
+  analytics?: {
+    viewCount: number;
+    clickCount: number;
+    averageTimeSpent: number;
+  };
+}
+
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [projects, setProjects] = useState<any[]>([]);
-  const [visitorChartData, setVisitorChartData] = useState<any[]>([]);
-  const [projectClicksData, setProjectClicksData] = useState<any[]>([]);
-  const [timeSpentData, setTimeSpentData] = useState<any[]>([]);
+  const [stats, setStats] = useState<VisitorStats | null>(null);
+  const [projects, setProjects] = useState<ProjectAnalytics[]>([]);
+  const [visitorChartData, setVisitorChartData] = useState<{ date: string; visitors: number; pageViews: number }[]>([]);
+  const [projectClicksData, setProjectClicksData] = useState<{ name: string; clicks: number }[]>([]);
+  const [timeSpentData, setTimeSpentData] = useState<{ date: string; timeSpent: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

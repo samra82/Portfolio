@@ -7,6 +7,7 @@ interface ProjectData {
   name: string;
   clicks: number;
   fill?: string;
+  [key: string]: string | number | undefined;
 }
 
 const COLORS = ['#8B4BEC', '#FDBE79', '#4D229D', '#2C2F6C', '#B0B0B0', '#F2F2F2'];
@@ -25,7 +26,7 @@ export default function ProjectPieChart({ data }: { data: ProjectData[] }) {
             fill="#8884d8"
             dataKey="clicks"
             nameKey="name"
-            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

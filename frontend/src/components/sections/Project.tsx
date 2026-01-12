@@ -9,7 +9,6 @@ import createImageUrlBuilder from "@sanity/image-url";
 
 import { getProjects } from "@/lib/api";
 import { fadeInUp } from "@/Animations/animations";
-import Link from "next/link";
 import { trackProjectClick } from "@/utils/tracking";
 
 const imageBuilder = createImageUrlBuilder({
@@ -17,7 +16,7 @@ const imageBuilder = createImageUrlBuilder({
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
 });
 
-const urlFor = (source: any) =>
+const urlFor = (source: { _ref: string; [key: string]: unknown }) =>
   imageBuilder.image(source).auto("format").fit("max");
 
 interface Project {
@@ -42,10 +41,36 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProjects()
-      .then(setProjects)
-      .catch(() => setProjects([]))
-      .finally(() => setLoading(false));
+    // Optimized data fetching with caching
+    const fetchProjects = async () => {
+      try {
+        // Add basic caching to avoid repeated API calls
+        const cacheKey = 'portfolio_projects';
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheTimeKey = 'portfolio_projects_time';
+        const cachedTime = localStorage.getItem(cacheTimeKey);
+
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        if (cachedData && cachedTime && (Date.now() - parseInt(cachedTime)) < CACHE_DURATION) {
+          setProjects(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+
+        const projectsData = await getProjects();
+        setProjects(projectsData);
+        localStorage.setItem(cacheKey, JSON.stringify(projectsData));
+        localStorage.setItem(cacheTimeKey, Date.now().toString());
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   return (
@@ -80,141 +105,264 @@ export default function Projects() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto space-y-20">
-        {!loading &&
-          projects.map((project, index) => {
-            const reverse = index % 2 !== 0;
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8B4BEC]"></div>
+          </div>
+        ) : (
+          <>
+            {projects.slice(0, 3).map((project, index) => { // Show first 3 projects immediately
+              const reverse = index % 2 !== 0;
 
-            const projectLink =
-              project.vercelLink ||
-              project.behanceLink ||
-              project.githubLink ||
-              "#";
-
-            const linkLabel = project.vercelLink
-              ? "Live Demo"
-              : project.behanceLink
-              ? "Case Study"
-              : project.githubLink
-              ? "Source Code"
-              : "View Project";
-
-            return (
-              <motion.article
-                key={project._id}
-                variants={fadeInUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                className={clsx(
-                  "grid grid-cols-1 lg:grid-cols-2 gap-10 items-center",
-                  reverse && "lg:[&>*:first-child]:order-2"
-                )}
-              >
-                {/* Media */}
-                <figure className="relative overflow-hidden rounded-xl border border-[#8B4BEC]/30 bg-[#2C2F6C]/40">
-                  <div className="relative aspect-[16/9]">
-                    <Image
-                      src={
-                        project.thumbnail?.asset?._ref
-                          ? urlFor(project.thumbnail)
-                              .width(960)
-                              .height(540)
-                              .url()
-                          : "/projects/resume-builder.svg"
-                      }
-                      alt={`${project.title} project preview`}
-                      fill
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover transition-transform duration-700 ease-out hover:scale-105"
-                    />
-                  </div>
-                </figure>
-
-                {/* Content */}
-                <div className="max-w-xl">
-                  <h3 className="text-xl md:text-2xl font-medium text-white mb-3">
-                    {project.title}
-                  </h3>
-
-                  <p className="text-[#B0B0B0] leading-relaxed mb-5">
-                    {project.description}
-                  </p>
-
-                  <dl className="text-sm text-[#B0B0B0] space-y-2 mb-6">
-                    <div>
-                      <dt className="inline font-medium text-white">Impact:</dt>{" "}
-                      <dd className="inline">{project.impact}</dd>
+              return (
+                <motion.article
+                  key={project._id}
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className={clsx(
+                    "grid grid-cols-1 lg:grid-cols-2 gap-10 items-center",
+                    reverse && "lg:[&>*:first-child]:order-2"
+                  )}
+                >
+                  {/* Media */}
+                  <figure className="relative overflow-hidden rounded-xl border border-[#8B4BEC]/30 bg-[#2C2F6C]/40">
+                    <div className="relative aspect-[16/9]">
+                      <Image
+                        src={
+                          project.thumbnail?.asset?._ref
+                            ? urlFor(project.thumbnail.asset)
+                                .width(400) // Reduced initial image size
+                                .height(225)
+                                .quality(70) // Lower quality for faster loading
+                                .url()
+                            : "/projects/resume-builder.svg"
+                        }
+                        alt={`${project.title} project preview`}
+                        fill
+                        priority={index === 0}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAADAAQDAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/AKg//9k=" // Base64 placeholder
+                        className="object-cover transition-transform duration-700 ease-out hover:scale-105"
+                        loading={index === 0 ? "eager" : "lazy"} // Only eager load the first image
+                      />
                     </div>
-                    <div>
-                      <dt className="inline font-medium text-white">Role:</dt>{" "}
-                      <dd className="inline">{project.role}</dd>
+                  </figure>
+
+                  {/* Content */}
+                  <div className="max-w-xl">
+                    <h3 className="text-xl md:text-2xl font-medium text-white mb-3">
+                      {project.title}
+                    </h3>
+
+                    <p className="text-[#B0B0B0] leading-relaxed mb-5">
+                      {project.description}
+                    </p>
+
+                    <dl className="text-sm text-[#B0B0B0] space-y-2 mb-6">
+                      <div>
+                        <dt className="inline font-medium text-white">Impact:</dt>{" "}
+                        <dd className="inline">{project.impact}</dd>
+                      </div>
+                      <div>
+                        <dt className="inline font-medium text-white">Role:</dt>{" "}
+                        <dd className="inline">{project.role}</dd>
+                      </div>
+                    </dl>
+
+                    {/* Tech Stack */}
+                    <ul className="flex flex-wrap gap-2 mb-6">
+                      {project.tech.map((tech) => (
+                        <li
+                          key={`${project._id}-${tech}`}
+                          className="text-xs px-3 py-1 rounded-full border border-[#8B4BEC]/30 bg-[#2C2F6C]/40 text-white"
+                        >
+                          {tech}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* CTA */}
+                    <div
+                      aria-label={`${project.title} project links`}
+                      className="flex flex-wrap items-center gap-5 text-sm font-medium"
+                    >
+                      {project.vercelLink && (
+                        <a
+                          href={project.vercelLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Live demo of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          View Project
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
+
+                      {project.behanceLink && (
+                        <a
+                          href={project.behanceLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Case study of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          Case Study
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
+
+                      {project.githubLink && (
+                        <a
+                          href={project.githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Source code of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          Code on GitHub
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
                     </div>
-                  </dl>
-
-                  {/* Tech Stack */}
-                  <ul className="flex flex-wrap gap-2 mb-6">
-                    {project.tech.map((tech) => (
-                      <li
-                        key={`${project._id}-${tech}`}
-                        className="text-xs px-3 py-1 rounded-full border border-[#8B4BEC]/30 bg-[#2C2F6C]/40 text-white"
-                      >
-                        {tech}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA */}
-                  <div
-                    aria-label={`${project.title} project links`}
-                    className="flex flex-wrap items-center gap-5 text-sm font-medium"
-                  >
-                    {project.vercelLink && (
-                      <a
-                        href={project.vercelLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Live demo of ${project.title}`}
-                        className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
-                        onClick={() => trackProjectClick(project._id, project.title)}
-                      >
-                        View Project
-                        <ExternalLink size={14} />
-                     </a>
-                    )}
-
-                    {project.behanceLink && (
-                      <a
-                        href={project.behanceLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Case study of ${project.title}`}
-                        className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
-                        onClick={() => trackProjectClick(project._id, project.title)}
-                      >
-                        Case Study
-                        <ExternalLink size={14} />
-                     </a>
-                    )}
-
-                    {project.githubLink && (
-                      <a
-                        href={project.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Source code of ${project.title}`}
-                        className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
-                        onClick={() => trackProjectClick(project._id, project.title)}
-                      >
-                        Code on GitHub
-                        <ExternalLink size={14} />
-                     </a>
-                    )}
                   </div>
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })}
+
+            {/* Render remaining projects with Intersection Observer for performance */}
+            {projects.slice(3).map((project, index) => {
+              const actualIndex = index + 3;
+              const reverse = actualIndex % 2 !== 0;
+
+              return (
+                <motion.article
+                  key={project._id}
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className={clsx(
+                    "grid grid-cols-1 lg:grid-cols-2 gap-10 items-center",
+                    reverse && "lg:[&>*:first-child]:order-2"
+                  )}
+                >
+                  {/* Media */}
+                  <figure className="relative overflow-hidden rounded-xl border border-[#8B4BEC]/30 bg-[#2C2F6C]/40">
+                    <div className="relative aspect-[16/9]">
+                      <Image
+                        src={
+                          project.thumbnail?.asset?._ref
+                            ? urlFor(project.thumbnail.asset)
+                                .width(400)
+                                .height(225)
+                                .quality(70)
+                                .url()
+                            : "/projects/resume-builder.svg"
+                        }
+                        alt={`${project.title} project preview`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAADAAQDAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/AKg//9k="
+                        className="object-cover transition-transform duration-700 ease-out hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                  </figure>
+
+                  {/* Content */}
+                  <div className="max-w-xl">
+                    <h3 className="text-xl md:text-2xl font-medium text-white mb-3">
+                      {project.title}
+                    </h3>
+
+                    <p className="text-[#B0B0B0] leading-relaxed mb-5">
+                      {project.description}
+                    </p>
+
+                    <dl className="text-sm text-[#B0B0B0] space-y-2 mb-6">
+                      <div>
+                        <dt className="inline font-medium text-white">Impact:</dt>{" "}
+                        <dd className="inline">{project.impact}</dd>
+                      </div>
+                      <div>
+                        <dt className="inline font-medium text-white">Role:</dt>{" "}
+                        <dd className="inline">{project.role}</dd>
+                      </div>
+                    </dl>
+
+                    {/* Tech Stack */}
+                    <ul className="flex flex-wrap gap-2 mb-6">
+                      {project.tech.map((tech) => (
+                        <li
+                          key={`${project._id}-${tech}`}
+                          className="text-xs px-3 py-1 rounded-full border border-[#8B4BEC]/30 bg-[#2C2F6C]/40 text-white"
+                        >
+                          {tech}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* CTA */}
+                    <div
+                      aria-label={`${project.title} project links`}
+                      className="flex flex-wrap items-center gap-5 text-sm font-medium"
+                    >
+                      {project.vercelLink && (
+                        <a
+                          href={project.vercelLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Live demo of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          View Project
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
+
+                      {project.behanceLink && (
+                        <a
+                          href={project.behanceLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Case study of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          Case Study
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
+
+                      {project.githubLink && (
+                        <a
+                          href={project.githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Source code of ${project.title}`}
+                          className="inline-flex items-center gap-2 text-[#8B4BEC] hover:text-[#FDBE79] transition"
+                          onClick={() => trackProjectClick(project._id, project.title)}
+                        >
+                          Code on GitHub
+                          <ExternalLink size={14} />
+                       </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </>
+        )}
       </div>
     </section>
   );

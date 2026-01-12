@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from '@/components/sections/Navbar';
 import Footer from '@/components/sections/Footer';
-import AppWrapper from '@/components/AppWrapper';
 
+// Preload critical resources
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap", // Optimize font loading
   weight: ["400", "500", "600", "700", "800"],
 });
 
@@ -53,6 +54,17 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  // Add performance hints
+  other: {
+    'theme-color': '#8B4BEC',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
@@ -61,15 +73,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <body
-        className={`${inter.variable} antialiased bg-gradient-to-br from-[#2C2F6C] via-[#4D229D] to-[#8B4BEC] text-white`}
+        className={`antialiased bg-gradient-to-br from-[#2C2F6C] via-[#4D229D] to-[#8B4BEC] text-white`}
       >
-        <AppWrapper>
-          <Navbar />
-          {children}
-          <Footer />
-        </AppWrapper>
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

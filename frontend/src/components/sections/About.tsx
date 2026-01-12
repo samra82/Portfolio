@@ -1,4 +1,4 @@
-import { container, item, fadeInUp, scaleIn, staggerContainer, staggerItem, royalEntrance } from "@/Animations/animations";
+import {  fadeInUp, staggerContainer } from "@/Animations/animations";
 import { motion } from "framer-motion";
 
 
@@ -61,7 +61,7 @@ const About = () => {
 
         {/* Cards */}
         <div className="grid gap-6 md:grid-cols-2">
-          {cards.map((card, index) => (
+          {cards.map((card) => (
             <motion.div
               key={card.title}
               variants={fadeInUp}

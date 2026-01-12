@@ -28,8 +28,16 @@ export async function getIpAddress(): Promise<string> {
   }
 }
 
+// Define interface for location data
+interface LocationData {
+  country?: string;
+  city?: string;
+  region?: string;
+  timezone?: string;
+}
+
 // Get visitor's location based on IP
-export async function getLocationFromIp(ip: string): Promise<any> {
+export async function getLocationFromIp(ip: string): Promise<LocationData | null> {
   try {
     if (ip === 'unknown') {
       return null;

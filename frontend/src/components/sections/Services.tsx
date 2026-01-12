@@ -57,8 +57,8 @@ const Services = () => {
           variants={fadeInUp}
           className="mx-auto mb-14 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg"
         >
-          I help startups and businesses turn ideas into scalable,
-          high-performing web products—built for clarity, speed, and long-term
+          I help startups and businesses turn ideas into scalable,{" "}
+          high-performing web products—built for clarity, speed, and long-term{" "}
           growth.
         </motion.p>
 
@@ -89,7 +89,7 @@ const Services = () => {
             whileHover={{ y: -3 }}
             whileTap={{ y: 0 }}
           >
-            Let's Build Your Product
+            Let&apos;s Build Your Product
           </motion.a>
         </motion.div>
       </motion.div>

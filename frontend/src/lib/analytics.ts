@@ -51,9 +51,15 @@ export async function getVisitorsOverTime() {
   } | order(firstVisit asc)`;
   const visitors = await client.fetch(query);
 
+  // Define interface for visitor data
+  interface Visitor {
+    firstVisit?: string;
+    [key: string]: unknown;
+  }
+
   // Group visitors by date
   const visitorsByDate: Record<string, number> = {};
-  visitors.forEach((visitor: any) => {
+  visitors.forEach((visitor: Visitor) => {
     if (visitor.firstVisit) {
       const date = new Date(visitor.firstVisit).toISOString().split('T')[0];
       visitorsByDate[date] = (visitorsByDate[date] || 0) + 1;
@@ -79,11 +85,22 @@ export async function getProjectClicksData() {
   }`;
   const visitors = await client.fetch(query);
 
+  // Define interface for project click data
+  interface ProjectClick {
+    projectTitle: string;
+    [key: string]: unknown;
+  }
+
+  interface VisitorWithProjectClicks {
+    projectClicks?: ProjectClick[];
+    [key: string]: unknown;
+  }
+
   // Count clicks per project
   const projectClicks: Record<string, number> = {};
-  visitors.forEach((visitor: any) => {
+  visitors.forEach((visitor: VisitorWithProjectClicks) => {
     if (visitor.projectClicks) {
-      visitor.projectClicks.forEach((click: any) => {
+      visitor.projectClicks.forEach((click: ProjectClick) => {
         if (click.projectTitle) {
           projectClicks[click.projectTitle] = (projectClicks[click.projectTitle] || 0) + 1;
         }
@@ -108,9 +125,16 @@ export async function getTimeSpentData() {
   } | order(firstVisit asc)`;
   const visitors = await client.fetch(query);
 
+  // Define interface for visitor time data
+  interface VisitorWithTimeSpent {
+    firstVisit?: string;
+    totalTimeSpent?: number;
+    [key: string]: unknown;
+  }
+
   // Group by date and calculate average time spent
   const timeByDate: Record<string, { total: number, count: number }> = {};
-  visitors.forEach((visitor: any) => {
+  visitors.forEach((visitor: VisitorWithTimeSpent) => {
     if (visitor.firstVisit && visitor.totalTimeSpent) {
       const date = new Date(visitor.firstVisit).toISOString().split('T')[0];
       if (!timeByDate[date]) {

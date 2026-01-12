@@ -1,14 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants, Easing } from 'framer-motion';
 import Link from 'next/link';
-import {
-  FaCompass,
-  FaLayerGroup,
-  FaCodeBranch,
-  FaRocket,
-} from 'react-icons/fa';
+import { FaCompass, FaLayerGroup, FaCodeBranch, FaRocket } from 'react-icons/fa';
 
+// Items for process cards
 const items = [
   {
     title: 'Product Clarity Before Code',
@@ -36,12 +32,20 @@ const items = [
   },
 ];
 
-const fadeUp = {
+// Custom easing for smooth animations
+const easeOut: Easing = [0.42, 0, 0.58, 1];
+
+// Variants for cards
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
-  visible: (i = 0) => ({
+  visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: 'easeOut' },
+    transition: {
+      delay: i * 0.1,
+      duration: 0.6,
+      ease: easeOut,
+    },
   }),
 };
 
@@ -80,7 +84,7 @@ export default function Process() {
             return (
               <motion.div
                 key={item.title}
-                custom={i}
+                custom={i} // required for function-based variant
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
@@ -110,7 +114,7 @@ export default function Process() {
           className="mt-20 text-center"
         >
           <p className="mb-6 text-lg text-[#F2F2F2]">
-            If this approach resonates, let's talk.
+            If this approach resonates, let&apos;s talk.
           </p>
           <Link
             href="#contact"

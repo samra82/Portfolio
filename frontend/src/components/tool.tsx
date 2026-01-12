@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   SiNextdotjs,
   SiReact,
@@ -27,58 +27,53 @@ const skills = [
   { name: "GitHub", icon: SiGithub },
 ];
 
+const SkillItem = React.memo(({ skill, isDuplicate = false }: { skill: typeof skills[0]; isDuplicate?: boolean }) => {
+  const IconComponent = skill.icon;
+  const key = isDuplicate ? `duplicate-${skill.name}` : `first-${skill.name}`;
+
+  return (
+    <div
+      key={key}
+      className="flex-shrink-0 flex items-center group mx-8"
+    >
+      <div className="p-3 rounded-xl transition-all duration-300 group-hover:scale-110">
+        <IconComponent className="text-4xl text-white opacity-70" />
+      </div>
+      <div className="ml-3">
+        <span className="text-lg font-medium text-white opacity-70 uppercase tracking-wider">
+          {skill.name}
+        </span>
+      </div>
+    </div>
+  );
+});
+SkillItem.displayName = 'SkillItem';
+
 const ToolRow = () => {
+  const memoizedSkills = useMemo(() => {
+    return [
+      ...skills.map(skill => ({ skill, isDuplicate: false })),
+      ...skills.map(skill => ({ skill, isDuplicate: true }))
+    ];
+  }, []);
+
   return (
     <div className="w-full">
       {/* Fixed height container for the revolving tools */}
-      <div className="relative h-20 overflow-hidden bg-indigo-900 ">
+      <div className="relative h-16 overflow-hidden bg-gradient-to-r from-[#4D229D]/20 to-[#2C2F6C]/20">
         <div className="absolute top-1/2 left-0 w-full transform -translate-y-1/2">
           <div className="animate-scroll flex items-center">
-            {skills.map((skill, index) => {
-              const IconComponent = skill.icon;
-              return (
-                <div
-                  key={`first-${index}`}
-                  className="flex-shrink-0 flex items-center group mx-8"
-                >
-                  <div className=" p-3 rounded-xl transition-all duration-300  group-hover:scale-110">
-                    <IconComponent className="text-4xl text-white opacity-70" />
-                  </div>
-                  <div className="ml-3">
-                    <span className="text-lg font-medium text-white opacity-70 uppercase tracking-wider">
-                      {skill.name}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-            {/* Duplicate the skills to create seamless looping */}
-            {skills.map((skill, index) => {
-              const IconComponent = skill.icon;
-              return (
-                <div
-                  key={`duplicate-${index}`}
-                  className="flex-shrink-0 flex items-center group mx-8"
-                >
-                  <div className="p-3 rounded-xl transition-all duration-300 group-hover:scale-110">
-                    <IconComponent className="text-4xl text-white opacity-70" />
-                  </div>
-                  <div className="ml-1">
-                    <span className="text-lg font-medium text-white opacity-70 uppercase tracking-wider">
-                      {skill.name}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            {memoizedSkills.map(({ skill, isDuplicate }) => (
+              <SkillItem key={`${isDuplicate ? 'duplicate-' : 'first-'}${skill.name}`} skill={skill} isDuplicate={isDuplicate} />
+            ))}
           </div>
         </div>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes scroll {
           0% {
-            transform: translateX(0);
+            transform: translateX(100%);
           }
           100% {
             transform: translateX(-100%);
@@ -86,13 +81,12 @@ const ToolRow = () => {
         }
 
         .animate-scroll {
-          animation: scroll 20s linear infinite;
+          animation: scroll 30s linear infinite;
           display: flex;
-          min-width: 200%;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .animate-scroll {
-            animation: scroll 40s linear infinite; /* Slower on mobile */
+            animation: scroll 60s linear infinite; /* Slower on mobile */
           }
         }
       `}</style>

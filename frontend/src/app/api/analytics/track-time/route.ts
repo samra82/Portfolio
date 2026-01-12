@@ -17,11 +17,29 @@ export async function POST(request: NextRequest) {
     // Get visitor document
     const visitorQuery = `*[_type == "visitor" && sessionId == $sessionId][0]`;
 
-    const existingVisitor = await client.fetch(visitorQuery, { sessionId });
+    interface Visitor {
+      _id: string;
+      pageVisits?: Array<{
+        page: string;
+        timeSpent?: number;
+        [key: string]: unknown;
+      }>;
+      totalTimeSpent?: number;
+      [key: string]: unknown;
+    }
+
+    const existingVisitor = await client.fetch<Visitor>(visitorQuery, { sessionId });
 
     if (existingVisitor) {
+      // Define types for page visit data
+      interface PageVisit {
+        page: string;
+        timeSpent?: number;
+        [key: string]: unknown;
+      }
+
       // Update the time spent for the specific page
-      const updatedPageVisits = (existingVisitor.pageVisits || []).map((visit: any) => {
+      const updatedPageVisits = (existingVisitor.pageVisits || []).map((visit: PageVisit) => {
         if (visit.page === pageUrl && !visit.timeSpent) {
           return {
             ...visit,
@@ -32,7 +50,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Calculate total time spent
-      const totalTimeSpent = updatedPageVisits.reduce((total: number, visit: any) => {
+      const totalTimeSpent = updatedPageVisits.reduce((total: number, visit: PageVisit) => {
         return total + (visit.timeSpent || 0);
       }, 0);
 

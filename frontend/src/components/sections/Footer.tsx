@@ -13,7 +13,7 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-            {['Twitter', 'LinkedIn', 'GitHub', 'Dribbble'].map((social, index) => (
+            {['Twitter', 'LinkedIn', 'GitHub', 'Dribbble'].map((social) => (
               <motion.a
                 key={social}
                 href="#"
