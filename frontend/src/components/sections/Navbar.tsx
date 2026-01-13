@@ -141,17 +141,15 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div
-          className="md:hidden bg-[#2C2F6C]/90 backdrop-blur-md py-4 px-6 border-t border-[#8B4BEC]/30 max-h-[70vh] overflow-y-auto transition-all duration-300"
-        >
+        <div className="md:hidden fixed top-16 left-0 right-0 bg-[#2C2F6C]/95 backdrop-blur-md py-4 px-6 border-t border-[#8B4BEC]/30 min-h-[calc(100vh-4rem)] z-40 overflow-y-auto">
           <div className="flex flex-col space-y-3">
             {navItems.map((item) => (
               <a
                 key={item.id}
                 href={item.href}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors duration-300 ${
+                className={`px-5 py-3.5 rounded-full text-base font-medium transition-colors duration-300 ${
                   activeSection === item.id
-                    ? 'text-[#8B4BEC]'
+                    ? 'text-[#8B4BEC] bg-white/10'
                     : 'text-gray-300 hover:text-white hover:bg-white/10'
                 }`}
                 onClick={(e) => scrollToSection(e, item.href)}
@@ -163,7 +161,7 @@ const Navbar = () => {
 
             <a
               href="#contact"
-              className="mt-3 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#4D229D] to-[#2C2F6C] text-white font-medium text-sm border border-[#8B4BEC]/30 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+              className="mt-4 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#4D229D] to-[#2C2F6C] text-white font-medium text-base border border-[#8B4BEC]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
               onClick={(e) => scrollToSection(e, '#contact')}
             >
               Hire Me

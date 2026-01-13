@@ -1,7 +1,22 @@
 import {  fadeInUp, staggerContainer } from "@/Animations/animations";
-import { motion } from "framer-motion";
+import { motion, Variants, Easing } from 'framer-motion';
 
+// Custom easing for smooth animations
+const easeOut: Easing = [0.42, 0, 0.58, 1];
 
+// Variants for cards
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.6,
+      ease: easeOut,
+    },
+  }),
+};
 
 const cards = [
   {

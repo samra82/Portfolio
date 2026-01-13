@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from '@/components/sections/Navbar';
 import Footer from '@/components/sections/Footer';
+import { AppWrapper } from "@/components/AppWrapper";
+import { Suspense } from "react";
 
 // Preload critical resources
 const inter = Inter({
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
     description: 'Portfolio of Samra Shafiq, Web Engineer specializing in creating pixel-perfect web applications',
     url: 'https://samrashafiq.com',
     siteName: 'Samra Shafiq Portfolio',
-    locale: 'en_US',
+    locale: 'en',
     type: 'website',
   },
   twitter: {
@@ -77,9 +79,13 @@ export default function RootLayout({
       <body
         className={`antialiased bg-gradient-to-br from-[#2C2F6C] via-[#4D229D] to-[#8B4BEC] text-white`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AppWrapper>
+          <Navbar />
+          {children}
+          <Footer />
+          </AppWrapper>
+        </Suspense>
       </body>
     </html>
   );
