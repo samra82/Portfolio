@@ -1,70 +1,110 @@
 'use client';
 
-import React, { lazy, Suspense } from 'react';
+import Hero from '@/components/sections/Hero';
+import dynamic from 'next/dynamic';
 
-// Lazy load heavy components
-const Hero = lazy(() => import('@/components/sections/Hero'));
-const About = lazy(() => import('@/components/sections/About'));
-const Services = lazy(() => import('@/components/sections/Services'));
-const Project = lazy(() => import('@/components/sections/Project'));
-const Contact = lazy(() => import('@/components/sections/Contact'));
-const Process = lazy(() => import('@/components/sections/Process'));
-const ToolMarquee = lazy(() => import('@/components/tool'));
+const About = dynamic(() => import('@/components/sections/About'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 md:py-20 px-6">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="h-8 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="h-4 w-72 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1,2,3].map(i => <div key={i} className="h-40 bg-white/5 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    </div>
+  ),
+});
+const ToolMarquee = dynamic(() => import('@/components/tool'), {
+  ssr: false,
+  loading: () => <div className="h-20 bg-white/5 rounded animate-pulse mx-6" />,
+});
+const Services = dynamic(() => import('@/components/sections/Services'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 md:py-20 px-6">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="h-8 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="h-4 w-72 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1,2,3].map(i => <div key={i} className="h-48 bg-white/5 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    </div>
+  ),
+});
+const Project = dynamic(() => import('@/components/sections/Project'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 md:py-20 px-6">
+      <div className="max-w-5xl mx-auto space-y-12">
+        <div className="h-8 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="h-4 w-72 bg-white/5 rounded animate-pulse mx-auto" />
+        {[1,2].map(i => <div key={i} className="h-64 bg-white/5 rounded-xl animate-pulse" />)}
+      </div>
+    </div>
+  ),
+});
+const Process = dynamic(() => import('@/components/sections/Process'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 md:py-20 px-6">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="h-8 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    </div>
+  ),
+});
+const Contact = dynamic(() => import('@/components/sections/Contact'), {
+  ssr: false,
+  loading: () => (
+    <div className="py-16 md:py-20 px-6">
+      <div className="max-w-3xl mx-auto space-y-8">
+        <div className="h-8 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="h-4 w-72 bg-white/5 rounded animate-pulse mx-auto" />
+        <div className="space-y-4">
+          {[1,2,3].map(i => <div key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />)}
+        </div>
+        <div className="h-12 w-32 bg-white/5 rounded-lg animate-pulse mx-auto" />
+      </div>
+    </div>
+  ),
+});
 
-// Loading skeleton for better UX
-const ComponentLoader = () => (
-  <div className="min-h-[400px] flex items-center justify-center bg-gradient-to-br from-indigo-900/20 to-purple-900/20">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400"></div>
-  </div>
-);
-
-const Portfolio = () => {
+export default function Portfolio() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-purple-500 text-white">
-      {/* Main Content - remove animated background elements for better performance */}
+    <div className="min-h-screen overflow-x-hidden bg-[#0B0816] text-white">
       <main>
         <section id="home">
-          <Suspense fallback={<ComponentLoader />}>
-            <Hero />
-          </Suspense>
+          <Hero />
         </section>
 
         <section id="about">
-          <Suspense fallback={<ComponentLoader />}>
-            <About />
-          </Suspense>
-          <Suspense fallback={<div className="h-20 bg-gradient-to-r from-indigo-900/10 to-purple-900/10"></div>}>
-            <ToolMarquee />
-          </Suspense>
+          <About />
+          <ToolMarquee />
         </section>
 
         <section id="services">
-          <Suspense fallback={<ComponentLoader />}>
-            <Services />
-          </Suspense>
+          <Services />
         </section>
 
         <section id="portfolio">
-          <Suspense fallback={<ComponentLoader />}>
-            <Project />
-          </Suspense>
+          <Project />
         </section>
 
         <section id="process">
-          <Suspense fallback={<ComponentLoader />}>
-            <Process/>
-          </Suspense>
+          <Process />
         </section>
 
         <section id="contact">
-          <Suspense fallback={<ComponentLoader />}>
-            <Contact />
-          </Suspense>
+          <Contact />
         </section>
-
       </main>
     </div>
   );
-};
-
-export default Portfolio;
+}

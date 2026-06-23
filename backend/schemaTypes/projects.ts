@@ -75,16 +75,5 @@ export default defineType({
       description: 'Order to display the project',
       initialValue: 0,
     }),
-    defineField({
-      name: 'analytics',
-      title: 'Analytics',
-      type: 'object',
-      description: 'Analytics data for the project',
-      fields: [
-        { name: 'clickCount', type: 'number', title: 'Click Count', initialValue: 0 },
-        { name: 'viewCount', type: 'number', title: 'View Count', initialValue: 0 },
-        { name: 'averageTimeSpent', type: 'number', title: 'Average Time Spent (seconds)', initialValue: 0 },
-      ],
-    }),
   ],
 });

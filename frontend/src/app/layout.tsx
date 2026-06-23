@@ -3,15 +3,15 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from '@/components/sections/Navbar';
 import Footer from '@/components/sections/Footer';
-import { AppWrapper } from "@/components/AppWrapper";
-import { Suspense } from "react";
 
-// Preload critical resources
+// Trim weights to what's actually used once you've confirmed via grep
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap", // Optimize font loading
-  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Samra Shafiq - Web Engineer',
     description: 'Portfolio of Samra Shafiq, Web Engineer specializing in creating pixel-perfect web applications',
-    url: 'https://samrashafiq.com',
+    url: 'https://samrashafiq.xyz',
     siteName: 'Samra Shafiq Portfolio',
-    locale: 'en',
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
@@ -56,9 +56,8 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  // Add performance hints
   other: {
-    'theme-color': '#8B4BEC',
+    'theme-color': '#0B0816',
   },
 };
 
@@ -76,16 +75,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
-      <body
-        className={`antialiased bg-gradient-to-br from-[#2C2F6C] via-[#4D229D] to-[#8B4BEC] text-white`}
-      >
-        <Suspense fallback={<div>Loading...</div>}>
-          <AppWrapper>
-          <Navbar />
-          {children}
-          <Footer />
-          </AppWrapper>
-        </Suspense>
+      <body className="antialiased bg-[var(--primary-color)] text-[var(--text-primary)]" style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif" }}>
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+        <link rel="preload" href="/Hero.avif" as="image" fetchPriority="high" />
+        <meta name="description" content="Portfolio of Samra Shafiq, Web Engineer specializing in creating pixel-perfect web applications with Next.js, React, and modern technologies" />
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

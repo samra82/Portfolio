@@ -30,11 +30,13 @@ My admin dashboard (`/admin/login`) is like having x-ray vision for your website
 
 I spend my days turning impossible requirements into "already done" features and my nights dreaming about better algorithms. If you appreciate craftsmanship, attention to detail, and the occasional sarcastic comment about legacy code, then we should definitely connect.
 
-**Want to support my book addiction?** [Buy me a book](https://www.buymeacoffee.com/yourusername)! Every page I read translates to better code, more creativity, and the occasional "aha" moment that makes projects shine. Plus, I'll think of you every time I learn something new.
+**Want to support my book addiction?**
+ <!-- [Buy me a book](https://www.buymeacoffee.com/yourusername)! -->
+ Every page I read translates to better code, more creativity, and the occasional "aha" moment that makes projects shine. Plus, I'll think of you every time I learn something new.
 
 ## The Bottom Line
 
-MIT License because sharing knowledge is what makes the world go round (but please don't copy my portfolio—that's just awkward).
+MIT License because sharing knowledge is what makes the world go round (but please don't copy my portfolio—that's just awkward)😅.
 
 ---
 

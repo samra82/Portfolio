@@ -1,46 +1,31 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-    serverComponentsExternalPackages: [
-      '@sanity/client',
-      '@sanity/image-url',
+  typedRoutes: true,
+
+  serverExternalPackages: [
+    '@sanity/client',
+    '@sanity/image-url',
+  ],
+  
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2592000,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 64, 96, 128, 256],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'cdn.sanity.io' },
     ],
   },
 
-  images: {
-    formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
-    remotePatterns: [
-      { protocol: 'https', hostname: 'cdn.sanity.io' },
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'placehold.co' },
-    ],
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
   },
 
   reactStrictMode: true,
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true,
   trailingSlash: false,
-
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-  },
-
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    return config;
-  },
 
   async headers() {
     return [
@@ -59,6 +44,18 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'no-referrer-when-downgrade',
           },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/favicon.ico',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, immutable' },
         ],
       },
     ];

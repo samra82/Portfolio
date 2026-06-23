@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from "framer-motion";
-import { staggerContainer, fadeInUp } from "@/Animations/animations";
+import { staggerDelay } from "@/Animations/animations";
 
 const services = [
   {
@@ -32,67 +31,61 @@ const services = [
 ];
 
 const Services = () => {
+
+  const isInView = true;
+  const ref = null;
   return (
     <section
       id="services"
-      className="relative w-full px-6 py-24 md:px-12 bg-gradient-to-b from-[#2C2F6C]/50 to-[#4D229D]/50"
+      ref={ref}
+      className="relative w-full px-6 py-24 md:px-12 bg-[#1F143D]/50"
     >
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="mx-auto max-w-5xl text-center"
-      >
+      <div className="mx-auto max-w-5xl text-center">
         {/* Heading */}
-        <motion.div variants={fadeInUp} className="mb-8">
+        <div className={`mb-8 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           <h2 className="text-4xl font-bold mb-4">
-            My <span className="text-[#8B4BEC]">Services</span>
+            My <span className="text-[#9E47FF]">Services</span>
           </h2>
-          <div className="mt-4 h-[2px] w-16 bg-gradient-to-r from-[#8B4BEC] to-[#FDBE79] mx-auto rounded-full" />
-        </motion.div>
+          <div className="mt-4 h-[2px] w-16 bg-gradient-to-r from-[#9E47FF] to-[#D2B4FF] mx-auto rounded-full" />
+        </div>
 
         {/* Intro */}
-        <motion.p
-          variants={fadeInUp}
-          className="mx-auto mb-14 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg"
-        >
+        <p className={`mx-auto mb-14 max-w-3xl text-base leading-relaxed text-[#C3BCDB] md:text-lg transition-all duration-700 delay-100 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           I help startups and businesses turn ideas into scalable,{" "}
           high-performing web products—built for clarity, speed, and long-term{" "}
           growth.
-        </motion.p>
+        </p>
 
         {/* Service Cards */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <motion.div
+            <div
               key={service.title}
-              variants={fadeInUp}
-              custom={index * 0.1}
-              className="rounded-2xl border border-[#8B4BEC]/20 bg-[#2C2F6C]/30 p-6 text-left backdrop-blur transition hover:border-[#8B4BEC]/40 hover:bg-[#4D229D]/30"
+              style={staggerDelay(index)}
+              className={`rounded-2xl border border-[#9E47FF]/20 bg-[#1F143D]/30 p-6 text-left backdrop-blur transition-all duration-500 hover:border-[#9E47FF]/40 hover:bg-[#1F143D]/30 ${
+                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+              }`}
             >
-              <h3 className="mb-2 text-lg font-medium text-[#F2F2F2]">
+              <h3 className="mb-2 text-lg font-medium text-[#FFFFFF]">
                 {service.title}
               </h3>
-              <p className="text-sm leading-relaxed text-[#B0B0B0]">
+              <p className="text-sm leading-relaxed text-[#C3BCDB]">
                 {service.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* CTA */}
-        <motion.div variants={fadeInUp} className="mt-16">
-          <motion.a
+        <div className={`mt-16 transition-all duration-700 delay-300 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+          <a
             href="#contact"
-            className="btn btn-primary text-sm sm:text-base"
-            whileHover={{ y: -3 }}
-            whileTap={{ y: 0 }}
+            className="btn-primary"
           >
             Let&apos;s Build Your Product
-          </motion.a>
-        </motion.div>
-      </motion.div>
+          </a>
+        </div>
+      </div>
     </section>
   );
 };
