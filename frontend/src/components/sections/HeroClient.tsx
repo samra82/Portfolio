@@ -41,6 +41,7 @@ const BehanceIcon = ({ size }: { size: number }) => (
 const SOCIALS: Readonly<Social[]> = Object.freeze([
   { href: "https://github.com/samra82",                            label: "GitHub profile",    icon: <GithubIcon   size={22} /> },
   { href: "https://www.linkedin.com/in/samrashafiq-webengineer/", label: "LinkedIn profile",  icon: <LinkedinIcon size={22} /> },
+  { href: "https://www.behance.net/samrashafiq1",                  label: "Behance portfolio", icon: <BehanceIcon  size={22} /> },
 ]);
 
 const HeroClient = () => {
